@@ -6,9 +6,6 @@
 #define PWR_PORT    35760
 #define PXY_PORT    45760
 
-#define AGENT_FILE      "agent"
-#define FIRMWARE_FILE   "firmware"
-
 #define MAV_DIR "mav_"
 #define OBJ_DIR "objects"
 
