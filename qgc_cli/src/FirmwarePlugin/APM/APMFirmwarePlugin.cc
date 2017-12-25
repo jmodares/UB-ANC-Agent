@@ -21,7 +21,7 @@
 
 #include <QTcpSocket>
 
-#include "UBConfig.h"
+#include "../agent/UBConfig.h"
 
 QGC_LOGGING_CATEGORY(APMFirmwarePluginLog, "APMFirmwarePluginLog")
 
