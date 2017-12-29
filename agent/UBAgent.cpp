@@ -27,9 +27,7 @@ void UBAgent::startAgent() {
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
 
     parser.addOptions({
-//        {"clear-settings", "Starts with clear settings"},
-//        {"logging", "Start with logging", "log"},
-        {{"I", "instance"}, "Starts with clear settings", "id"},
+        {{"I", "instance"}, "Set instance (ID) of the agent", "id"},
     });
 
 //    parser.process(*QCoreApplication::instance());
