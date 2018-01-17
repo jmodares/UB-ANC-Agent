@@ -1,4 +1,4 @@
-Copyright © 2015 - 2018 Jalil Modares
+Copyright © 2014 - 2018 Jalil Modares
 
 This program was part of my Ph.D. Dissertation research in the Department of Electrical Engineering at the University at Buffalo. I worked in UB's Multimedia Communications and Systems Laboratory with my Ph.D. adviser, [Prof. Nicholas Mastronarde](http://www.eng.buffalo.edu/~nmastron).
 
@@ -28,10 +28,8 @@ Then we can use `qmake` to build the agent.
 
 ```
 cd ~
-mkdir ub-anc
-cd ub-anc
+mkdir ub-anc && cd ub-anc
 git clone https://github.com/jmodares/UB-ANC-Agent
-mkdir build
-cd build
+mkdir build && cd build
 qmake ../UB-ANC-Agent
 ```
