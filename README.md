@@ -56,7 +56,7 @@ cd ~/ub-anc/emulator
 ./start_emulator.sh
 ```
 
-This will launch the emulator using QGroundControl as the GUI. Note that you can not start the mission until you receive the following messages from the drones (which are accessible by clicking on the [Vehicle Messages](https://docs.qgroundcontrol.com/en/toolbar/toolbar.html) status icon in QGroundControl):
+This will launch the emulator using QGroundControl as the GUI. Note that you cannot start the mission until you receive the following messages from the drones (which are accessible by clicking on the [Vehicle Messages](https://docs.qgroundcontrol.com/en/toolbar/toolbar.html) status icon in QGroundControl):
 
 ```
 [XXX] Info: EKF2 IMU0 is using GPS
