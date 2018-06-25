@@ -15,12 +15,9 @@
 #define SERIAL_PORT "ttyACM0"
 #define BAUD_RATE   115200
 
-#define POINT_ZONE      1
-#define TAKEOFF_ALT     5
-#define GPS_ACCURACY    5
+#define POINT_ZONE      1           // Distance tolerance (meters)
+#define TAKEOFF_ALT     5           // Target altitude (meters)
 
-#define MISSION_TRACK_RATE  1000
-
-#define SAVE_RATE   5
+#define MISSION_TRACK_PERIOD  1.0   // Mission update period (seconds)
 
 #endif // UBCONFIG_H
