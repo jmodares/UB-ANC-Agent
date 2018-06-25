@@ -111,6 +111,12 @@ void UBAgent::armedChangedEvent(bool armed) {
         return;
     }
 
+    /********************** IMPORTANT SAFETY INFORMATION **********************
+       We require that the drone is set to Guided mode before it is armed.
+       Since we allow the drone to be armed by another drone (over the network),
+       this extra step ensures that the operator is ready
+       before the drone takes off.
+    **************************************************************************/
 //    m_mav->setGuidedMode(true);
     if (!m_mav->guidedMode()) {
         qWarning() << "The mission cannot start unless the drone is in Guided mode!";
