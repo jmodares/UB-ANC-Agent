@@ -61,7 +61,7 @@ void UBAgent::startAgent() {
     connect(qgcApp()->toolbox()->multiVehicleManager(), SIGNAL(vehicleRemoved(Vehicle*)), this, SLOT(vehicleRemovedEvent(Vehicle*)));
 
     m_net->connectToHost(QHostAddress::LocalHost, 10 * id + NET_PORT);
-    m_timer->start(MISSION_TRACK_RATE);
+    m_timer->start(1000.0 * MISSION_TRACK_PERIOD);    // m_timer in milliseconds
 }
 
 void UBAgent::setMAV(Vehicle* mav) {
@@ -196,7 +196,7 @@ void UBAgent::stageMission() {
         return;
     }
 
-    if (m_mission_data.tick < (20 * 1000 / MISSION_TRACK_RATE)) {
+    if (m_mission_data.tick < (20 * MISSION_TRACK_PERIOD)) {
         m_mission_data.tick++;
         m_net->sendData(m_mav->id() + 1, QByteArray(1, MAV_CMD_NAV_TAKEOFF));
     } else {
