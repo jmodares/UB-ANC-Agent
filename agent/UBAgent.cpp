@@ -102,23 +102,23 @@ void UBAgent::vehicleRemovedEvent(Vehicle* mav) {
 
 void UBAgent::armedChangedEvent(bool armed) {
     if (!armed) {
-        m_mission_stage = STAGE_IDLE;
+        m_mission_state = STATE_IDLE;
         return;
     }
 
     if (m_mav->altitudeRelative()->rawValue().toDouble() > POINT_ZONE) {
-        qWarning() << "The mission can not start while the drone is airborne!";
+        qWarning() << "The mission cannot start if the drone is airborne!";
         return;
     }
 
 //    m_mav->setGuidedMode(true);
     if (!m_mav->guidedMode()) {
-        qWarning() << "The mission can not start while the drone is not in Guided mode!";
+        qWarning() << "The mission cannot start unless the drone is in Guided mode!";
         return;
     }
 
     m_mission_data.reset();
-    m_mission_stage = STAGE_TAKEOFF;
+    m_mission_state = STATE_TAKEOFF;
     qInfo() << "Mission starts...";
 
 //    m_mav->guidedModeTakeoff();
@@ -133,25 +133,30 @@ void UBAgent::flightModeChangedEvent(QString mode) {
     qInfo() << mode;
 }
 
+// Process/handle received packets here
 void UBAgent::dataReadyEvent(quint8 srcID, QByteArray data) {
     Q_UNUSED(data)
     if(srcID == m_mav->id() - 1 && !m_mav->armed()) {
+        // setArmed() is not always successful
+        // If it is successful, UBAgent::armedChangedEvent() will be called
         m_mav->setArmed(true);
     }
 }
 
+// Mission logic goes here
+// For illustration, the mission is implemented as a state machine
 void UBAgent::missionTracker() {
-    switch (m_mission_stage) {
-    case STAGE_IDLE:
+    switch (m_mission_state) {
+    case STATE_IDLE:
         stageIdle();
         break;
-    case STAGE_TAKEOFF:
+    case STATE_TAKEOFF:
         stageTakeoff();
         break;
-    case STAGE_MISSION:
+    case STATE_MISSION:
         stageMission();
         break;
-    case STAGE_LAND:
+    case STATE_LAND:
         stageLand();
         break;
     default:
@@ -160,18 +165,19 @@ void UBAgent::missionTracker() {
 }
 
 void UBAgent::stageIdle() {
+    // Do nothing
 }
 
 void UBAgent::stageTakeoff() {
     if (m_mav->altitudeRelative()->rawValue().toDouble() > TAKEOFF_ALT - POINT_ZONE) {
         m_mission_data.stage = 0;
-        m_mission_stage = STAGE_MISSION;
+        m_mission_state = STATE_MISSION;
     }
 }
 
 void UBAgent::stageLand() {
     if (m_mav->altitudeRelative()->rawValue().toDouble() < POINT_ZONE) {
-        m_mission_stage = STAGE_IDLE;
+        m_mission_state = STATE_IDLE;
         qInfo() << "Mission ends";
     }
 }
@@ -182,13 +188,15 @@ void UBAgent::stageMission() {
     if (m_mission_data.stage == 0) {
         m_mission_data.stage++;
 
-        dest = m_mav->coordinate().atDistanceAndAzimuth(10, 90); // 0 -> North, 90 (M_PI / 2) -> East
+        // Set destination 10 meters to the East
+        dest = m_mav->coordinate().atDistanceAndAzimuth(10, 90); // 0 -> North; 90 (M_PI / 2) -> East
         m_mav->guidedModeGotoLocation(dest);
 
         return;
     }
 
     if (m_mission_data.stage == 1) {
+        // Check if destination has been reached (within tolerance)
         if (m_mav->coordinate().distanceTo(dest) < POINT_ZONE) {
             m_mission_data.stage++;
         }
@@ -196,11 +204,12 @@ void UBAgent::stageMission() {
         return;
     }
 
-    if (m_mission_data.tick < (20 * MISSION_TRACK_PERIOD)) {
+    // Wait 20 seconds before switching to Land mode
+    if (m_mission_data.tick < (20.0 / MISSION_TRACK_PERIOD)) {
         m_mission_data.tick++;
         m_net->sendData(m_mav->id() + 1, QByteArray(1, MAV_CMD_NAV_TAKEOFF));
     } else {
         m_mav->guidedModeLand();
-        m_mission_stage = STAGE_LAND;
+        m_mission_state = STATE_LAND;
     }
 }
