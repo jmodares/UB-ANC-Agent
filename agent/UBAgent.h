@@ -35,12 +35,12 @@ protected:
     void stageLand();
 
 protected:
-    enum EMissionStage {
-        STAGE_IDLE,
-        STAGE_TAKEOFF,
-        STAGE_MISSION,
-        STAGE_LAND,
-    } m_mission_stage;
+    enum EMissionState {
+        STATE_IDLE,
+        STATE_TAKEOFF,
+        STATE_MISSION,
+        STATE_LAND,
+    } m_mission_state;
 
     struct SMissionData {
         int stage;
@@ -52,7 +52,7 @@ protected:
         }
     } m_mission_data;
 
-protected:    
+protected:
     Vehicle* m_mav;
     UBNetwork* m_net;
 
