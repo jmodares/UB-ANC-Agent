@@ -146,6 +146,8 @@ void UBAgent::flightModeChangedEvent(QString mode) {
 // Process/handle received packets
 void UBAgent::dataReadyEvent(quint8 srcID, QByteArray data) {
     Q_UNUSED(data)
+
+    // If a message is received from the previous drone in the chain, then arm
     if(srcID == m_mav->id() - 1 && !m_mav->armed()) {
         // setArmed() is not always successful
         // If it is successful, UBAgent::armedChangedEvent() will be called
@@ -187,7 +189,7 @@ void UBAgent::stageTakeoff() {
 }
 
 void UBAgent::stageLand() {
-    // Check if near ground (within tolerance)
+    // Check if near the ground (within tolerance)
     if (m_mav->altitudeRelative()->rawValue().toDouble() < POINT_ZONE) {
         m_mission_state = STATE_IDLE;
         qInfo() << "Mission ends";
@@ -201,8 +203,8 @@ void UBAgent::stageMission() {
     if (m_mission_data.stage == 0) {
         m_mission_data.stage++;
 
-        // Set destination 10 meters to the East
-        dest = m_mav->coordinate().atDistanceAndAzimuth(10, 90); // 0 -> North; 90 (M_PI / 2) -> East
+        // Set destination 10 meters to the East (0 => North; 90 (Pi / 2) => East)
+        dest = m_mav->coordinate().atDistanceAndAzimuth(10, 90);
         m_mav->guidedModeGotoLocation(dest);
 
         return;
