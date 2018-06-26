@@ -25,30 +25,62 @@ UBAgent::UBAgent(QObject *parent) : QObject(parent),
 
 void UBAgent::startAgent() {
     QCommandLineParser parser;
+    parser.setApplicationDescription("UB-ANC Agent Software");
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
+    parser.addHelpOption();
 
+    // Specify MAV ID if running in the UB-ANC Emulator
     parser.addOptions({
-        {{"I", "instance"}, "Set instance (ID) of the agent", "id"},
+        {{"I", "instance"}, "Set instance (ID) of the simulated agent.", "id"},
+    });
+
+    // Specify drone type if running on hardware
+    //  aero - Intel Aero (using TCP Port 5760 to flight controller)
+    //  ubanc - UBANC Drone (using serial connection to flight controller)
+    parser.addOptions({
+        {{"D", "drone"}, "Set drone type for deployment.", "aero or ubanc"},
     });
 
 //    parser.process(*QCoreApplication::instance());
-    parser.parse(QCoreApplication::arguments());
+//    parser.parse(QCoreApplication::arguments());
+    parser.process(QCoreApplication::arguments());
 
+    QString typeStr = parser.value("D");
     quint8 id = parser.value("I").toUInt();
+
     LinkConfiguration* link = nullptr;
-    if (id) {
+    if (typeStr == "aero") {
+        qInfo() << "[UB-ANC Agent] Operating on Intel Aero Drone.";
+
+        quint32 port = STL_PORT;
+        TCPConfiguration* tcp = new TCPConfiguration(tr("TCP Port %1").arg(port));
+        tcp->setAddress(QHostAddress::LocalHost);
+        tcp->setPort(port);
+
+        link = tcp;
+
+    } else if (typeStr == "ubanc") {
+        qInfo() << "[UB-ANC Agent] Operating on UB-ANC Drone.";
+
+        SerialConfiguration* serial = new SerialConfiguration("Serial Port");
+        serial->setBaud(BAUD_RATE);
+        serial->setPortName(SERIAL_PORT);
+
+        link = serial;
+
+    } else if (id) {
+        qInfo() << "[UB-ANC Agent] Operating in UB-ANC Emulator.";
+
         quint32 port = 10 * id + STL_PORT + 3;
         TCPConfiguration* tcp = new TCPConfiguration(tr("TCP Port %1").arg(port));
         tcp->setAddress(QHostAddress::LocalHost);
         tcp->setPort(port);
 
         link = tcp;
-    } else {
-        SerialConfiguration* serial = new SerialConfiguration("Serial Port");
-        serial->setBaud(BAUD_RATE);
-        serial->setPortName(SERIAL_PORT);
 
-        link = serial;
+    } else {
+        qWarning() << "WARNING: Invalid input arguments.";
+        exit(1);
     }
 
     link->setDynamic();
@@ -62,7 +94,7 @@ void UBAgent::startAgent() {
     connect(qgcApp()->toolbox()->multiVehicleManager(), SIGNAL(vehicleRemoved(Vehicle*)), this, SLOT(vehicleRemovedEvent(Vehicle*)));
 
     m_net->connectToHost(QHostAddress::LocalHost, 10 * id + NET_PORT);
-    m_timer->start(1000.0 * MISSION_TRACK_PERIOD);    // m_timer in milliseconds
+    m_timer->start(1000.0 * MISSION_TRACK_PERIOD); // m_timer in milliseconds
 }
 
 void UBAgent::setMAV(Vehicle* mav) {
