@@ -10,6 +10,7 @@
 #include "TCPLink.h"
 #include "QGCApplication.h"
 
+
 UBAgent::UBAgent(QObject *parent) : QObject(parent),
     m_mav(nullptr)
 {
@@ -65,6 +66,7 @@ void UBAgent::startAgent() {
 }
 
 void UBAgent::setMAV(Vehicle* mav) {
+    // If m_mav is already initialized, then disconnect it first
     if (m_mav) {
         disconnect(m_mav, SIGNAL(armedChanged(bool)), this, SLOT(armedChangedEvent(bool)));
         disconnect(m_mav, SIGNAL(flightModeChanged(QString)), this, SLOT(flightModeChangedEvent(QString)));
@@ -72,6 +74,7 @@ void UBAgent::setMAV(Vehicle* mav) {
 
     m_mav = mav;
 
+    // Connect new mav
     if (m_mav) {
         connect(m_mav, SIGNAL(armedChanged(bool)), this, SLOT(armedChangedEvent(bool)));
         connect(m_mav, SIGNAL(flightModeChanged(QString)), this, SLOT(flightModeChangedEvent(QString)));
@@ -100,6 +103,7 @@ void UBAgent::vehicleRemovedEvent(Vehicle* mav) {
     qInfo() << "MAV disconnected with ID: " << mav->id();
 }
 
+// Handle arm/disarm event
 void UBAgent::armedChangedEvent(bool armed) {
     if (!armed) {
         m_mission_state = STATE_IDLE;
@@ -139,7 +143,7 @@ void UBAgent::flightModeChangedEvent(QString mode) {
     qInfo() << mode;
 }
 
-// Process/handle received packets here
+// Process/handle received packets
 void UBAgent::dataReadyEvent(quint8 srcID, QByteArray data) {
     Q_UNUSED(data)
     if(srcID == m_mav->id() - 1 && !m_mav->armed()) {
@@ -149,8 +153,8 @@ void UBAgent::dataReadyEvent(quint8 srcID, QByteArray data) {
     }
 }
 
-// Mission logic goes here
-// For illustration, the mission is implemented as a state machine
+// Mission logic
+// This example mission is implemented as a state machine
 void UBAgent::missionTracker() {
     switch (m_mission_state) {
     case STATE_IDLE:
@@ -175,6 +179,7 @@ void UBAgent::stageIdle() {
 }
 
 void UBAgent::stageTakeoff() {
+    // Check if target altitude has been reached (within tolerance)
     if (m_mav->altitudeRelative()->rawValue().toDouble() > TAKEOFF_ALT - POINT_ZONE) {
         m_mission_data.stage = 0;
         m_mission_state = STATE_MISSION;
@@ -182,6 +187,7 @@ void UBAgent::stageTakeoff() {
 }
 
 void UBAgent::stageLand() {
+    // Check if near ground (within tolerance)
     if (m_mav->altitudeRelative()->rawValue().toDouble() < POINT_ZONE) {
         m_mission_state = STATE_IDLE;
         qInfo() << "Mission ends";
@@ -191,6 +197,7 @@ void UBAgent::stageLand() {
 void UBAgent::stageMission() {
     static QGeoCoordinate dest;
 
+    // 0th stage of the mission (after taking off, before landing)
     if (m_mission_data.stage == 0) {
         m_mission_data.stage++;
 
@@ -201,8 +208,9 @@ void UBAgent::stageMission() {
         return;
     }
 
+    // 1st stage of the mission
     if (m_mission_data.stage == 1) {
-        // Check if destination has been reached (within tolerance)
+        // Check if target destination has been reached (within tolerance)
         if (m_mav->coordinate().distanceTo(dest) < POINT_ZONE) {
             m_mission_data.stage++;
         }
@@ -210,9 +218,12 @@ void UBAgent::stageMission() {
         return;
     }
 
+    // 2nd stage of the mission
     // Wait 20 seconds before switching to Land mode
     if (m_mission_data.tick < (20.0 / MISSION_TRACK_PERIOD)) {
         m_mission_data.tick++;
+
+        // Send packet to next mav in the chain
         m_net->sendData(m_mav->id() + 1, QByteArray(1, MAV_CMD_NAV_TAKEOFF));
     } else {
         m_mav->guidedModeLand();
