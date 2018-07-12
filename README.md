@@ -27,7 +27,6 @@ sudo apt-get install qt5-default qtbase5-dev \
 ```
 
 Then, we can use `qmake` to build the agent:
-
 ```
 cd ~
 mkdir ub-anc && cd ub-anc
@@ -43,13 +42,11 @@ The build process will take some time.
 Before deploying any mission on an actual drone, we recommend that you first test it in the [UB-ANC Emulator](https://github.com/jmodares/UB-ANC-Emulator).
 
 To test the UB-ANC Agent mission in the UB-ANC Emulator, simply copy the UB-ANC Agent executable `agent` (located in **~/ub-anc/build-agent/agent/release/**) into the emulator's **mav** directory:
-
 ```
 cp ~/ub-anc/build-agent/agent/release/agent ~/ub-anc/emulator/mav/agent
 ```
 
 Now, let's test the mission with 3 drones:
-
 ```
 cd ~/ub-anc/emulator
 ./setup_objects.sh 3
@@ -57,7 +54,6 @@ cd ~/ub-anc/emulator
 ```
 
 This will launch the emulator using QGroundControl as the GUI. Note that you cannot start the mission until you receive the following messages from the drones (which are accessible by clicking on the [Vehicle Messages](https://docs.qgroundcontrol.com/en/toolbar/toolbar.html) status icon in QGroundControl):
-
 ```
 [XXX] Info: EKF2 IMU0 is using GPS
 [XXX] Info: EKF2 IMU1 is using GPS
