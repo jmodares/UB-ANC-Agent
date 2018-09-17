@@ -41,6 +41,11 @@ The build process will take some time.
 ## Running in the UB-ANC Emulator
 Before deploying any mission on an actual drone, we recommend that you first test it in the [UB-ANC Emulator](https://github.com/jmodares/UB-ANC-Emulator).
 
+To build a mission for UB-ANC Emulator, you can install the qmake as described above, or you can source `setup_emulator.sh` (located in **~/ub-anc/emulator**):
+```
+source setup_emulator.sh
+```
+
 To test the UB-ANC Agent mission in the UB-ANC Emulator, simply copy the UB-ANC Agent executable `agent` (located in **~/ub-anc/build-agent/agent/release/**) into the emulator's **mav** directory:
 ```
 cp ~/ub-anc/build-agent/agent/release/agent ~/ub-anc/emulator/mav/agent
