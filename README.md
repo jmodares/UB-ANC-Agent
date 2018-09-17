@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License along with thi
 The **UB-ANC Agent**, which is the software that controls the drone, is designed to be compatible with any flight controller that supports the popular Micro Air Vehicle Communications Protocol, [MAVLink](http://mavlink.org). With its modular design, UB-ANC Drone provides tools for networking researchers to study airborne networking protocols and robotics researchers to study mission planning algorithms without worrying about other implementation details. Furthermore, we envision that it will facilitate collaborative work between networking and robotics researchers interested in problems related to network topology control and managing trade offs between mission objectives and network performance.
 
 ## Build
-The current version of UB-ANC Agent uses [QGroundControl 3.2](http://qgroundcontrol.com) as its main library. The build process explained here is targeted for 64-bit Linux (Debian compatible) platforms. We recommend using [64-bit Ubuntu 16.04](http://releases.ubuntu.com/16.04/). Before building the UB-ANC Agent, run the following commands to setup your system:
+The current version of UB-ANC Agent uses [QGroundControl 3.2](http://qgroundcontrol.com) as its main library. The build process explained here is targeted for 64-bit Linux (Debian compatible) platforms. We recommend using [64-bit Ubuntu 16.04](http://releases.ubuntu.com/16.04/). Before building the UB-ANC Agent, run the following commands to setup your system and install qmake:
 ```
 sudo apt-get update && sudo apt-get upgrade
 sudo apt-get install qt5-default qtbase5-dev \
