@@ -52,7 +52,9 @@ void UBAgent::startAgent() {
     if (typeStr == "aero") {
         qInfo() << "[UB-ANC Agent] Operating on Intel Aero Drone.";
 
-        quint32 port = STL_PORT;
+        // Intel Aero Drone: MAVLink Router redirects MAVLink messages that
+        //   are sent to AERO_PORT to/from the flight controller
+        quint32 port = AERO_PORT;
         TCPConfiguration* tcp = new TCPConfiguration(tr("TCP Port %1").arg(port));
         tcp->setAddress(QHostAddress::LocalHost);
         tcp->setPort(port);
@@ -62,6 +64,7 @@ void UBAgent::startAgent() {
     } else if (typeStr == "ubanc") {
         qInfo() << "[UB-ANC Agent] Operating on UB-ANC Drone.";
 
+        // UB-ANC Drone: Connect to flight controller over serial port
         SerialConfiguration* serial = new SerialConfiguration("Serial Port");
         serial->setBaud(BAUD_RATE);
         serial->setPortName(SERIAL_PORT);
@@ -71,6 +74,8 @@ void UBAgent::startAgent() {
     } else if (id) {
         qInfo() << "[UB-ANC Agent] Operating in UB-ANC Emulator.";
 
+        // UB-ANC Emulator: Agent number id connects to SITL through
+        //   port 10 * id + STL_PORT + 3 (id starts at 1)
         quint32 port = 10 * id + STL_PORT + 3;
         TCPConfiguration* tcp = new TCPConfiguration(tr("TCP Port %1").arg(port));
         tcp->setAddress(QHostAddress::LocalHost);
@@ -93,6 +98,11 @@ void UBAgent::startAgent() {
     connect(qgcApp()->toolbox()->multiVehicleManager(), SIGNAL(vehicleAdded(Vehicle*)), this, SLOT(vehicleAddedEvent(Vehicle*)));
     connect(qgcApp()->toolbox()->multiVehicleManager(), SIGNAL(vehicleRemoved(Vehicle*)), this, SLOT(vehicleRemovedEvent(Vehicle*)));
 
+    // UB-ANC Drone or Intel Aero:
+    //   Network traffic passes through NET_PORT (id is 0)
+    // UB-ANC Emulator:
+    //   Agent number id connects to network through
+    //   port 10 * id + NET_PORT (id starts at 1)
     m_net->connectToHost(QHostAddress::LocalHost, 10 * id + NET_PORT);
     m_timer->start(1000.0 * MISSION_TRACK_PERIOD); // m_timer in milliseconds
 }

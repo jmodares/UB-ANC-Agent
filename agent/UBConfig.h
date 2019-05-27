@@ -1,10 +1,11 @@
 #ifndef UBCONFIG_H
 #define UBCONFIG_H
 
-#define STL_PORT    5760
-#define NET_PORT    15760
-#define PWR_PORT    35760
-#define PXY_PORT    45760
+#define STL_PORT    5760            // Base SITL Port
+#define AERO_PORT   5760            // Intel Aero MAVLink Router Port
+#define NET_PORT    15760           // Base Network Port
+#define PWR_PORT    35760           // Not used
+#define PXY_PORT    45760           // Not used
 
 #define MAV_DIR "mav_"
 #define OBJ_DIR "objects"

@@ -8,6 +8,7 @@
 UBNetwork::UBNetwork(QTcpSocket *parent) : QTcpSocket(parent),
     m_id(0)
 {
+    // readyRead is emitted when data is available to read from the TCP socket
     connect(this, SIGNAL(readyRead()), this, SLOT(dataReadyEvent()));
 }
 
@@ -21,9 +22,10 @@ void UBNetwork::sendData(quint8 desID, QByteArray data) {
 }
 
 void UBNetwork::dataReadyEvent() {
-    m_data += readAll();
+    m_data += readAll(); // Read bytestream from TCP socket
 
     while (true) {
+        // PACKET_END in bytestream indicates that an entire packet as been read
         int bytes = m_data.indexOf(PACKET_END);
         if (bytes == -1) {
             break;
