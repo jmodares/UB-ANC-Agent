@@ -19,6 +19,8 @@ The **UB-ANC Agent**, which is the software that controls the drone, is designed
 
 Some information about the **UB-ANC Agent's API** can be found [here](https://github.com/jmodares/UB-ANC-Emulator/wiki/UB-ANC-Agent-API).
 
+The **master** branch code is not commented. Please see the **clarity** branch, which includes comments, if you need help understanding the code. In addition to comments, the clarity branch includes some improved variable names and more command line features; however, it has not been thoroughly tested on actual drones. 
+
 ## Build
 The current version of UB-ANC Agent uses [QGroundControl 3.2](http://qgroundcontrol.com) as its main library. The build process explained here is targeted for 64-bit Linux (Debian compatible) platforms. We recommend using [64-bit Ubuntu 16.04](http://releases.ubuntu.com/16.04/). Before building the UB-ANC Agent, run the following commands to setup your system and install qmake:
 ```
