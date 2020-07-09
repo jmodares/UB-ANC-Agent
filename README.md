@@ -1,9 +1,9 @@
-Copyright © 2014 - 2019 Jalil Modares
+Copyright © 2014 - 2020 Jalil Modares
 
 This program was part of my Ph.D. Dissertation research in the Department of Electrical Engineering at the University at Buffalo. I worked in UB's Multimedia Communications and Systems Laboratory with my Ph.D. adviser, [Prof. Nicholas Mastronarde](http://www.eng.buffalo.edu/~nmastron).
 
 If you use this program for your work/research, please cite:
-[J. Modares, N. Mastronarde, "UB-ANC: a Flexible Airborne Networking and Communications Testbed"](https://doi.org/10.1145/2980159.2980176).
+[J. Modares, N. Mastronarde, and K. Dantu, "Simulating unmanned aerial vehicle swarms with the UB-ANC Emulator," International Journal of Micro Air Vehicles, vol. 11, April 2019](https://doi.org/10.1177%2F1756829319837668).
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
 
@@ -22,6 +22,9 @@ Some information about the **UB-ANC Agent's API** can be found [here](https://gi
 The **master** branch code is not commented. Please see the **clarity** branch, which includes comments, if you need help understanding the code. In addition to comments, the clarity branch includes some improved variable names and more command line features; however, it has not been thoroughly tested on actual drones. 
 
 ## Build
+We now describe how to build the UB-ANC Agent to host on a drone or for use in the [UB-ANC Emulator](https://github.com/jmodares/UB-ANC-Emulator).
+
+### Building for use on a drone
 The current version of UB-ANC Agent uses [QGroundControl 3.2](http://qgroundcontrol.com) as its main library. The build process explained here is targeted for 64-bit Linux (Debian compatible) platforms. We recommend using [64-bit Ubuntu 16.04](http://releases.ubuntu.com/16.04/). Before building the UB-ANC Agent, run the following commands to setup your system and install qmake:
 ```
 sudo apt-get update && sudo apt-get upgrade
@@ -42,15 +45,27 @@ make
 
 The build process will take some time.
 
-## Running in the UB-ANC Emulator
+### Building for use in the UB-ANC Emulator
 Before deploying any mission on an actual drone, we recommend that you first test it in the [UB-ANC Emulator](https://github.com/jmodares/UB-ANC-Emulator).
 
-To build a mission for the UB-ANC Emulator, you can install qmake as described above, or you can source `setup_emulator.sh` (located in **~/ub-anc/emulator**):
+To build a mission for the UB-ANC Emulator, you have two options:
+1) follow the same build process used on the drone, as described above; or 
+2) you can source `setup_emulator.sh` (located in **~/ub-anc/emulator**):
 ```
-source setup_emulator.sh
+source ~/ub-anc/emulator/setup_emulator.sh
+```
+and then use `qmake` to build the agent:
+```
+cd ~
+mkdir ub-anc && cd ub-anc
+git clone https://github.com/jmodares/UB-ANC-Agent
+mkdir build-agent && cd build-agent
+qmake ../UB-ANC-Agent
+make
 ```
 
-To test the UB-ANC Agent mission in the UB-ANC Emulator, simply copy the UB-ANC Agent executable `agent` (located in **~/ub-anc/build-agent/agent/release/**) into the emulator's **mav** directory:
+## Running in the UB-ANC Emulator
+To test the UB-ANC Agent mission in the UB-ANC Emulator (after you build it), simply copy the UB-ANC Agent executable `agent` (located in **~/ub-anc/build-agent/agent/release/**) into the emulator's **mav** directory:
 ```
 cp ~/ub-anc/build-agent/agent/release/agent ~/ub-anc/emulator/mav/agent
 ```
@@ -68,7 +83,7 @@ This will launch the emulator using QGroundControl as the GUI. Note that you can
 [XXX] Info: EKF2 IMU1 is using GPS
 ```
 
-Once you observe these messages, select the vehicles one-by-one from the *vehicle menu* and change their modes from **Stabilize** to **Guided** using the *flight mode* menu. After all the vehicles are in Guided mode, select *Vehicle 1*. Click **Disarmed** to arm Vehicle 1. You will be prompted to confirm that you want to arm the vehicle. After confirming, *Vehicle 1*'s status will change to **Armed** and it will takeoff to 5 m, fly east 5 m, hover for 20 seconds, and then land. When it first starts to hover, it will send a message to *Vehicle 2* that will trigger it to run the same mission. *Vehicle 2* will in turn trigger *Vehicle 3*. After *Vehicle 3* lands, the mission is over.
+Once you observe these messages, select the vehicles one-by-one from the *vehicle menu* and change their modes from **Stabilize** to **Guided** using the *flight mode* menu. After all the vehicles are in Guided mode, select *Vehicle 1*. Click **Disarmed** to arm Vehicle 1. You will be prompted to confirm that you want to arm the vehicle. After confirming, *Vehicle 1*'s status will change to **Armed** and it will takeoff to 5 m, fly east 10 m, hover for 20 seconds, and then land. When it first starts to hover, it will send a message to *Vehicle 2* that will trigger it to run the same mission. *Vehicle 2* will in turn trigger *Vehicle 3*. After *Vehicle 3* lands, the mission is over.
 
 **Exercise 1:** Without quitting the UB-ANC Emulator, have the agents repeat the mission. *Hint:* Reset the Vehicles to **Guided** mode and arm *Vehicle 1* again.
 
